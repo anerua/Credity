@@ -1,2 +1,13 @@
 # Credity
-Credity
+Credity is a esusu-based group savings platform. 
+
+The **esusu** (or **esu**) is a fund to which a group of individuals make fixed contributions of money at fixed intervals; the total amount contributed by the entire group is assigned to each of the members in rotation.
+
+Among the Yorubas, esusu cooperatives operate as follows:
+a group of people team up to contribute a fixed and equal sum of money at specific intervals – daily, weekly, fortnightly, monthly or bi-monthly – enabling each member to collect the entire sum in rotation. When everyone in the group has benefited from the pool, a new rotation cycle is launched. The order in which people get to draw the money is usually decided by means of a ballot or by consensus.
+
+The number of contributions, the size of the contributions and the length of the intervals at which they are made vary from one group to another. For the purpose of illustration, however, we may imagine a simple case where twenty members contribute a thousand naira each, monthly. At the end of twenty months, which completes the cycle in this case, each member will have contributed twenty thousand naira, and will, on one occasion, have received the amount of twenty thousand naira in return. In theory, at least, each member is paid back in one lump sum exactly what he has paid in contributions during the course of one cycle. There is neither gain nor loss, but the advantage to the members is that they have available a large sum of money with which to make expensive purchases or to meet debts of considerable size. The length of the cycle depends both on the length of the intervals between contributions and on the number of memberships.
+
+The number of memberships need not be the same as the number of members. A single individual may hold more than one “membership” in a given esusu group by regularly making more than one contributions and receiving the fund more than once during a single cycle. Conversely, a single “membership” may be shared by two or more individuals who are not able to afford the entire contribution separately. These several individuals count as a single member of the esusu, and when their turn comes to receive the esusu fund they share it proportionately according to their contributions. Again each individual receives exactly what he has actually contributed. The member who receives the fund must contribute to it and to allsubsequent funds until the cycle is completed, after which he is free to withdraw from the group if he wishes.
+
+The esusu is a credit institution. All members except the ones who receive or share the very last fund of a given cycle receive an advance on their contributions, although the amount advanced declines as the cycle progresses.
