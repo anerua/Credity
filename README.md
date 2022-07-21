@@ -1,5 +1,5 @@
 # Credity
-Credity is a esusu-based group savings platform. 
+**Credity** is a esusu-based group savings platform. 
 
 The **esusu** (or **esu**) is a fund to which a group of individuals make fixed contributions of money at fixed intervals; the total amount contributed by the entire group is assigned to each of the members in rotation.
 
