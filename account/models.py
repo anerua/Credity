@@ -3,6 +3,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from helpers.models import TrackingModel
 
 
 class CustomUserManager(UserManager):
@@ -38,7 +39,7 @@ class CustomUserManager(UserManager):
         return self._create_user(email, password, **extra_fields) 
 
 
-class User(AbstractBaseUser, PermissionsMixin, models.Model):
+class User(AbstractBaseUser, PermissionsMixin, TrackingModel):
     
     first_name = models.CharField(_("first name"), max_length=150, blank=False)
     last_name = models.CharField(_("last name"), max_length=150, blank=False)
@@ -62,7 +63,7 @@ class User(AbstractBaseUser, PermissionsMixin, models.Model):
         _("active"),
         default=True,
         help_text=_(
-            "Designates whether this user's email is verified. "
+            "Designates whether this user's email is verified."
         ),
     )
 
@@ -71,3 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin, models.Model):
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
+
+    @property
+    def token(self):
+        return ""
