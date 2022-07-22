@@ -31,6 +31,9 @@ SECRET_KEY = config('SECRET_KEY')
 
 ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', 'credity.herokuapp.com']
 
+# Custom User authentication model
+AUTH_USER_MODEL = "account.User"
+
 
 # Application definition
 
@@ -43,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'account',
 ]
 
 MIDDLEWARE = [
