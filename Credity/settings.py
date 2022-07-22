@@ -15,6 +15,8 @@ from pathlib import Path
 from decouple import config
 
 import dj_database_url
+import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -98,7 +100,10 @@ DATABASES = {
     }
 }
 
-DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+# Check if running on heroku and set the database accordingly
+# Can use any environment variable but DYNO seems to be the most heroku-specific
+if 'DYNO' in os.environ:
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 
 # Password validation
