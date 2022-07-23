@@ -100,8 +100,8 @@ if os.environ.get('GITHUB_WORKFLOW'):
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'github_actions',
-            'USER': config('DB_USER'),
-            'PASSWORD': config('DB_PASSWORD'),
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
             'HOST': 'localhost',
             'PORT': '5432'
         }
