@@ -100,6 +100,18 @@ DATABASES = {
     }
 }
 
+if os.environ.get('GITHUB_WORKFLOW'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'github_actions',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'localhost',
+            'PORT': '5432'
+        }
+    }
+
 # Check if running on heroku and set the database accordingly
 # Can use any environment variable but DYNO seems to be the most heroku-specific
 if 'DYNO' in os.environ:
