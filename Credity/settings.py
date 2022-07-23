@@ -17,6 +17,7 @@ from decouple import config
 import dj_database_url
 import os
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,9 +29,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
+DEBUG = config("DEBUG")
 
 ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', 'credity.herokuapp.com']
+
+# Custom User authentication model
+AUTH_USER_MODEL = "account.User"
 
 
 # Application definition
@@ -44,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'account',
 ]
 
 MIDDLEWARE = [
@@ -107,6 +112,8 @@ if os.environ.get('GITHUB_WORKFLOW'):
         }
     }
 
+# Check if running on heroku and set the database accordingly
+# Can use any environment variable but DYNO seems to be the most heroku-specific
 if 'DYNO' in os.environ:
     DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
