@@ -2,7 +2,7 @@ from rest_framework.test import APITestCase
 from account.models import User
 
 
-class TestModel(APITestCase):
+class UserModelTests(APITestCase):
     
     def test_creates_user(self):
         user = User.objects.create_user(email="test@example.com", password="testpassword", first_name="First", last_name="Last")

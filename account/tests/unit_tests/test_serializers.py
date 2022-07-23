@@ -2,7 +2,7 @@ from rest_framework.test import APITestCase
 from account.serializers import RegisterSerializer
 
 
-class TestRegisterSerializer(APITestCase):
+class RegisterSerializerTests(APITestCase):
 
     test_data = {
         "email": "test@example.com",
