@@ -140,6 +140,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'helpers.validators.LowerCaseValidator',
     },
+    {
+        'NAME': 'helpers.validators.UpperCaseValidator',
+    },
+    {
+        'NAME': 'helpers.validators.DigitValidator',
+    },
 ]
 
 
