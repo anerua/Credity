@@ -146,6 +146,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'helpers.validators.DigitValidator',
     },
+    {
+        'NAME': 'helpers.validators.PunctuationValidator',
+    },
 ]
 
 

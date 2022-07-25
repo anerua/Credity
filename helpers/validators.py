@@ -55,3 +55,21 @@ class DigitValidator:
         
     def get_help_text(self):
         return _("Your password must contain at least one digit.")
+
+
+class PunctuationValidator:
+
+    def validate(self, password, user=None):
+        contains_punctuation = False
+        for character in password:
+            if character in punctuation:
+                contains_punctuation = True
+                break
+        if not contains_punctuation:
+            raise ValidationError(
+                _(f"This password must contain at least one punctuation {punctuation}."),
+                code="password_must_contain_punctuation",
+            )
+        
+    def get_help_text(self):
+        return _(f"Your password must contain at least one punctuation {punctuation}.")
