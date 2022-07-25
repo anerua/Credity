@@ -40,7 +40,7 @@ class RegisterSerializerTests(APITestCase):
         self.assertTrue(serializer.is_valid())
         self.assertNotIn("password", serializer.data)
 
-    def test_serializer_processes_correct_password_length(self):
+    def test_serializer_processes_correct_password(self):
         data = self.test_data.copy()
         serializer = RegisterSerializer(data=data)
         self.assertTrue(serializer.is_valid())
@@ -55,6 +55,34 @@ class RegisterSerializerTests(APITestCase):
     def test_serializer_is_invalid_if_password_is_too_long(self):
         data = self.test_data.copy()
         data["password"] = "password"*32
+        serializer = RegisterSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("password", serializer.errors)
+
+    def test_serializer_is_invalid_if_password_does_not_contain_at_least_one_lowercase_letter(self):
+        data = self.test_data.copy()
+        data["password"] = "A1R+=W-@TE"
+        serializer = RegisterSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("password", serializer.errors)
+
+    def test_serializer_is_invalid_if_password_does_not_contain_at_least_one_uppercase_letter(self):
+        data = self.test_data.copy()
+        data["password"] = "a1r+=w-@te"
+        serializer = RegisterSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("password", serializer.errors)
+
+    def test_serializer_is_invalid_if_password_does_not_contain_at_least_one_digit(self):
+        data = self.test_data.copy()
+        data["password"] = "ArR+=w-@Tte"
+        serializer = RegisterSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("password", serializer.errors)
+    
+    def test_serializer_is_invalid_if_password_does_not_contain_at_least_one_special_character(self):
+        data = self.test_data.copy()
+        data["password"] = "A1rRwWTtE"
         serializer = RegisterSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("password", serializer.errors)
