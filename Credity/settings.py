@@ -123,16 +123,19 @@ if 'DYNO' in os.environ:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'account.validators.LowerCaseValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'account.validators.UpperCaseValidator',
+    },
+    {
+        'NAME': 'account.validators.DigitValidator',
+    },
+    {
+        'NAME': 'account.validators.PunctuationValidator',
     },
 ]
 

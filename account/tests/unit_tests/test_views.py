@@ -9,7 +9,7 @@ class RegisterAPIViewTests(APITestCase):
     
     test_data = {
         "email": "test@example.com",
-        "password": "password",
+        "password": "aA1-K+4fX",
         "first_name": "First",
         "last_name": "Last",
     }
