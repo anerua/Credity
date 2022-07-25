@@ -47,14 +47,14 @@ class RegisterSerializerTests(APITestCase):
 
     def test_serializer_is_invalid_if_password_is_too_short(self):
         data = self.test_data.copy()
-        data["password"] = "1234567"
+        data["password"] = "A1r;WT"
         serializer = RegisterSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("password", serializer.errors)
 
     def test_serializer_is_invalid_if_password_is_too_long(self):
         data = self.test_data.copy()
-        data["password"] = "password"*32
+        data["password"] = "A1r;wWT+E"*32
         serializer = RegisterSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("password", serializer.errors)
