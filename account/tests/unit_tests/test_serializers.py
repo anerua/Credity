@@ -6,7 +6,7 @@ class RegisterSerializerTests(APITestCase):
 
     test_data = {
         "email": "test@example.com",
-        "password": "password",
+        "password": "aA1-K+4fX",
         "first_name": "First",
         "last_name": "Last",
     }
@@ -37,7 +37,7 @@ class RegisterSerializerTests(APITestCase):
     def test_serializer_does_not_return_password_in_its_data(self):
         data = self.test_data.copy()
         serializer = RegisterSerializer(data=data)
-        self.assertTrue(serializer.is_valid())
+        serializer.is_valid()
         self.assertNotIn("password", serializer.data)
 
     def test_serializer_processes_correct_password(self):
