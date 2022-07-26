@@ -1,7 +1,6 @@
 from django.urls import reverse
-from rest_framework import response, status
+from rest_framework import status
 from rest_framework.test import APITestCase
-from account.views import RegisterAPIView
 from account.models import User
 
 
