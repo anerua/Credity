@@ -1,5 +1,6 @@
 from rest_framework.test import APITestCase
-from account.serializers import RegisterSerializer
+from account.serializers import RegisterSerializer, DetailSerializer
+from account.models import User
 
 
 class RegisterSerializerTests(APITestCase):
@@ -94,3 +95,20 @@ class RegisterSerializerTests(APITestCase):
         self.assertEqual(user.email, data["email"])
         self.assertEqual(user.first_name, data["first_name"])
         self.assertEqual(user.last_name, data["last_name"])
+
+
+class DetailSerializerTests(APITestCase):
+
+    test_data = {
+        "email": "test@example.com",
+        "password": "aA1-K+4fX",
+        "first_name": "First",
+        "last_name": "Last",
+    }
+
+    def test_serializer_correctly_serializes_valid_user_object(self):
+        data = self.test_data.copy()
+        user = User.objects.create_user(**data)
+        serializer = DetailSerializer(user)
+        del data["password"]
+        self.assertDictEqual(serializer.data, data)

@@ -1,20 +1,20 @@
-from rest_framework import response, status
-from rest_framework.generics import GenericAPIView
-from account.serializers import RegisterSerializer
+from rest_framework import response, status, permissions
+from rest_framework.generics import GenericAPIView, CreateAPIView
+from account.serializers import RegisterSerializer, DetailSerializer
 
 
 
-class RegisterAPIView(GenericAPIView):
+class RegisterAPIView(CreateAPIView):
 
     serializer_class = RegisterSerializer
 
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
 
-        if serializer.is_valid():
-            serializer.save()
-            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+class DetailAPIView(GenericAPIView):
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request):
+        user = request.user
+        serializer = DetailSerializer(user)
+        return response.Response(serializer.data)
         
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-

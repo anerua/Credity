@@ -34,3 +34,14 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
           
         return super(RegisterSerializer, self).validate(data)
+
+
+class DetailSerializer(serializers.ModelSerializer):
+
+    email = serializers.EmailField(read_only=True)
+    first_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
+    
+    class Meta:
+        model = User
+        fields = ("email", "first_name", "last_name")
