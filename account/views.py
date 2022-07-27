@@ -1,6 +1,6 @@
 from rest_framework import response, status
-from rest_framework.generics import GenericAPIView, CreateAPIView
-from account.serializers import RegisterSerializer
+from rest_framework.generics import GenericAPIView, CreateAPIView, RetrieveAPIView
+from account.serializers import RegisterSerializer, DetailSerializer
 
 
 
@@ -11,4 +11,8 @@ class RegisterAPIView(CreateAPIView):
 
 class DetailAPIView(GenericAPIView):
 
-    ...
+    serializer_class = DetailSerializer
+
+    def get(self, request):
+        
+        ...
