@@ -112,8 +112,3 @@ class DetailSerializerTests(APITestCase):
         serializer = DetailSerializer(user)
         del data["password"]
         self.assertDictEqual(serializer.data, data)
-
-    # def test_serializer_is_invalid_if_user_not_found(self):
-    #     user = None
-    #     serializer = DetailSerializer(user)
-    #     self.assertTrue(serializer.errors)
