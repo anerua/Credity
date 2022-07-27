@@ -1,5 +1,5 @@
-from rest_framework import response, status
-from rest_framework.generics import GenericAPIView, CreateAPIView, RetrieveAPIView
+from rest_framework import response, status, permissions
+from rest_framework.generics import GenericAPIView, CreateAPIView
 from account.serializers import RegisterSerializer, DetailSerializer
 
 
@@ -11,8 +11,10 @@ class RegisterAPIView(CreateAPIView):
 
 class DetailAPIView(GenericAPIView):
 
-    serializer_class = DetailSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
+        user = request.user
+        serializer = DetailSerializer(user)
+        return response.Response(serializer.data)
         
-        ...
