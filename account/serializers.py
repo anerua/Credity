@@ -45,3 +45,14 @@ class DetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("email", "first_name", "last_name")
+
+
+class UpdateSerializer(serializers.ModelSerializer):
+
+    email = serializers.EmailField(read_only=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    
+    class Meta:
+        model = User
+        fields = ("email", "first_name", "last_name")
