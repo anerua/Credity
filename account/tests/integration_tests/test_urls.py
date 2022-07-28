@@ -147,7 +147,7 @@ class UserUpdateTests(APITestCase):
         new_data = self.test_data.copy()
         new_data["first_name"] = "NewFirst"
         new_data["last_name"] = "NewLast"
-        del data["password"]
+        del new_data["password"]
         response = self.client.put(
             reverse("user_update"),
             new_data,
