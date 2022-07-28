@@ -1,5 +1,5 @@
 from rest_framework.test import APITestCase
-from account.serializers import RegisterSerializer, DetailSerializer
+from account.serializers import RegisterSerializer, DetailSerializer, UpdateSerializer
 from account.models import User
 
 
@@ -112,3 +112,36 @@ class DetailSerializerTests(APITestCase):
         serializer = DetailSerializer(user)
         del data["password"]
         self.assertDictEqual(serializer.data, data)
+
+    
+class UpdateSerializerTests(APITestCase):
+
+    test_data = {
+        "email": "test@example.com",
+        "password": "aA1-K+4fX",
+        "first_name": "First",
+        "last_name": "Last",
+    }
+
+    def test_serializer_correctly_serializes_valid_data_and_user_object(self):
+        data = self.test_data.copy()
+        user = User.objects.create_user(**data)
+        data["first_name"] = "NewFirst"
+        data["last_name"] = "NewLast"
+        del data["email"], data["password"]
+        serializer = UpdateSerializer(user, data=data)
+        self.assertTrue(serializer.is_valid())
+        data = self.test_data.copy()
+        del data["password"]
+        self.assertDictEqual(serializer.data, data)
+        self.assertEqual(user.email, data["email"])
+        self.assertEqual(user.first_name, "NewFirst")
+        self.assertEqual(user.last_name, "NewLast")
+
+    def test_serializer_is_invalid_if_input_data_is_invalid(self):
+        data = self.test_data.copy()
+        user = User.objects.create_user(**data)
+        serializer = UpdateSerializer(user)
+        self.assertTrue(serializer.is_valid())
+        self.assertTrue(serializer.errors)
+

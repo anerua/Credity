@@ -18,3 +18,10 @@ class DetailAPIView(GenericAPIView):
         serializer = DetailSerializer(user)
         return response.Response(serializer.data)
         
+
+class UpdateAPIView(GenericAPIView):
+
+    permission_classes = (permissions.IsAuthenticated,)
+    
+    def put(self, request):
+        ...
