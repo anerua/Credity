@@ -131,8 +131,8 @@ class UpdateSerializerTests(APITestCase):
         del data["email"], data["password"]
         serializer = UpdateSerializer(user, data=data)
         self.assertTrue(serializer.is_valid())
-        data = self.test_data.copy()
-        del data["password"]
+        serializer.save()
+        data["email"] = "test@example.com"
         self.assertDictEqual(serializer.data, data)
         self.assertEqual(user.email, data["email"])
         self.assertEqual(user.first_name, "NewFirst")
@@ -141,7 +141,7 @@ class UpdateSerializerTests(APITestCase):
     def test_serializer_is_invalid_if_input_data_is_invalid(self):
         data = self.test_data.copy()
         user = User.objects.create_user(**data)
-        serializer = UpdateSerializer(user)
-        self.assertTrue(serializer.is_valid())
+        serializer = UpdateSerializer(user, data=None)
+        self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
