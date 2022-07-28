@@ -123,4 +123,54 @@ class UserDetailTests(APITestCase):
     def test_user_detail_request_unsuccessful_if_user_is_not_logged_in(self):
         response = self.client.get(reverse("user_detail"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-    
+
+
+class UserUpdateTests(APITestCase):
+
+    test_data = {
+        "email": "test@example.com",
+        "password": "aA1-K+4fX",
+        "first_name": "First",
+        "last_name": "Last",
+    }
+
+    def test_user_detail_update_successful_if_user_is_logged_in(self):
+        data = self.test_data.copy()
+        # First register a user
+        self.client.post(reverse("register"), data, format='json')
+        del data["first_name"]
+        del data["last_name"]
+        # Obtain tokens for registered user
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        access_token = response.data["access"]
+
+        new_data = self.test_data.copy()
+        new_data["first_name"] = "NewFirst"
+        new_data["last_name"] = "NewLast"
+        del data["password"]
+        response = self.client.put(
+            reverse("user_update"),
+            new_data,
+            format='json',
+            HTTP_AUTHORIZATION=f"Bearer {access_token}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.data, new_data)
+
+    def test_user_detail_update_unsuccessful_if_user_is_not_logged_in(self):
+        data = self.test_data.copy()
+        response = self.client.put(reverse("user_update"), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_user_detail_update_unsuccessful_if_all_required_fields_are_not_provided(self):
+        data = self.test_data.copy()
+        # First register a user
+        self.client.post(reverse("register"), data, format='json')
+        del data["first_name"]
+        del data["last_name"]
+        # Obtain tokens for registered user
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        access_token = response.data["access"]
+
+        response = self.client.put(reverse("user_update"), HTTP_AUTHORIZATION=f"Bearer {access_token}")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
