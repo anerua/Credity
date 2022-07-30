@@ -1,6 +1,7 @@
 from rest_framework.test import APITestCase
-from account.serializers import RegisterSerializer, DetailSerializer, UpdateSerializer
+from account.serializers import *
 from account.models import User
+from django.contrib.auth.hashers import check_password
 
 
 class RegisterSerializerTests(APITestCase):
@@ -145,3 +146,53 @@ class UpdateSerializerTests(APITestCase):
         self.assertFalse(serializer.is_valid())
         self.assertTrue(serializer.errors)
 
+
+class ChangeAuthSerializerTests(APITestCase):
+
+    test_data = {
+        "email": "test@example.com",
+        "password": "aA1-K+4fX",
+        "first_name": "First",
+        "last_name": "Last",
+    }
+    new_password = "bB2/L*5gY"
+
+    def test_serializer_processes_correct_input_data_successfully(self):
+        data = self.test_data.copy()
+        user = User.objects.create_user(**data)
+        serializer = ChangeAuthSerializer(
+            user,
+            data={
+                "old_password": data["password"],
+                "new_password": self.new_password
+            }
+        )
+        self.assertTrue(serializer.is_valid())
+        serializer.save()
+        self.assertTrue(user.check_password(self.new_password))
+
+    def test_serializer_invalid_if_old_password_is_incorrect(self):
+        data = self.test_data.copy()
+        user = User.objects.create_user(**data)
+        serializer = ChangeAuthSerializer(
+            user,
+            data={
+                "old_password": self.new_password,
+                "new_password": self.new_password
+            }
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertFalse(user.check_password(self.new_password))
+
+    def test_serializer_invalid_if_new_password_is_unacceptable(self):
+        data = self.test_data.copy()
+        user = User.objects.create_user(**data)
+        serializer = ChangeAuthSerializer(
+            user,
+            data={
+                "old_password": data["password"],
+                "new_password": "invalidPassWord"
+            }
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertFalse(user.check_password(self.new_password))
