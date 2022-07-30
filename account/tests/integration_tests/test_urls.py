@@ -174,3 +174,84 @@ class UserUpdateTests(APITestCase):
 
         response = self.client.put(reverse("user_update"), HTTP_AUTHORIZATION=f"Bearer {access_token}")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class ChangeAuthTests(APITestCase):
+
+    test_data = {
+        "email": "test@example.com",
+        "password": "aA1-K+4fX",
+        "first_name": "First",
+        "last_name": "Last",
+    }
+
+    new_password = "bB2/L*5gY"
+
+    def test_change_account_password_successful(self):
+        data = self.test_data.copy()
+        # First register a user
+        self.client.post(reverse("register"), data, format='json')
+        del data["first_name"]
+        del data["last_name"]
+        # Obtain tokens for registered user
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        access_token = response.data["access"]
+
+        response = self.client.put(
+            reverse("change_auth"),
+            {
+                "old_password": data["password"],
+                "new_password": self.new_password,
+            },
+            format='json',
+            HTTP_AUTHORIZATION=f"Bearer {access_token}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.data, {"message": "Success"})
+
+    def test_change_account_password_failed_because_user_is_not_logged_in(self):
+        data = self.test_data.copy()
+        response = self.client.put(reverse("change_auth"), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_change_account_password_failed_because_old_password_is_incorrect(self):
+        data = self.test_data.copy()
+        # First register a user
+        self.client.post(reverse("register"), data, format='json')
+        del data["first_name"]
+        del data["last_name"]
+        # Obtain tokens for registered user
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        access_token = response.data["access"]
+
+        response = self.client.put(
+            reverse("change_auth"),
+            {
+                "old_password": "zZ0-J+3eW",
+                "new_password": self.new_password,
+            },
+            format='json',
+            HTTP_AUTHORIZATION=f"Bearer {access_token}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_change_account_password_failed_because_new_password_is_unacceptable(self):
+        data = self.test_data.copy()
+        # First register a user
+        self.client.post(reverse("register"), data, format='json')
+        del data["first_name"]
+        del data["last_name"]
+        # Obtain tokens for registered user
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        access_token = response.data["access"]
+
+        response = self.client.put(
+            reverse("change_auth"),
+            {
+                "old_password": data["password"],
+                "new_password": "invalidPassWord",
+            },
+            format='json',
+            HTTP_AUTHORIZATION=f"Bearer {access_token}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
