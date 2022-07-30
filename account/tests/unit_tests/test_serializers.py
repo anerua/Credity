@@ -182,6 +182,7 @@ class ChangeAuthSerializerTests(APITestCase):
             }
         )
         self.assertFalse(serializer.is_valid())
+        self.assertIn("old_password", serializer.errors)
         self.assertFalse(user.check_password(self.new_password))
 
     def test_serializer_invalid_if_new_password_is_unacceptable(self):
@@ -195,4 +196,5 @@ class ChangeAuthSerializerTests(APITestCase):
             }
         )
         self.assertFalse(serializer.is_valid())
+        self.assertIn("new_password", serializer.errors)
         self.assertFalse(user.check_password(self.new_password))

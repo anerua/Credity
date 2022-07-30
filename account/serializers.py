@@ -86,7 +86,7 @@ class ChangeAuthSerializer(serializers.ModelSerializer):
             validators.validate_password(password=data["new_password"])
         # the exception raised here is different than serializers.ValidationError
         except exceptions.ValidationError as e:
-            errors['password'] = list(e.messages)
+            errors["new_password"] = list(e.messages)
          
         if errors:
             raise serializers.ValidationError(errors)

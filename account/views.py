@@ -1,6 +1,6 @@
 from rest_framework import response, status, permissions
 from rest_framework.generics import GenericAPIView, CreateAPIView
-from account.serializers import RegisterSerializer, DetailSerializer, UpdateSerializer
+from account.serializers import *
 
 
 class RegisterAPIView(CreateAPIView):
@@ -37,8 +37,11 @@ class ChangeAuthView(GenericAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def put(self, request):
-        if request.data["old_password"] != "aA1-K+4fX":
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
-        if request.data["new_password"] == "invalidPassWord":
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
-        return response.Response({"message": "Success"})
+        user = request.user
+        serializer = ChangeAuthSerializer(user, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response({"message": "Success"})
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
