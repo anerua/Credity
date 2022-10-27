@@ -198,3 +198,21 @@ class ChangeAuthSerializerTests(APITestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("new_password", serializer.errors)
         self.assertFalse(user.check_password(self.new_password))
+
+
+class DeleteSerializerTests(APITestCase):
+    
+    test_data = {
+        "email": "test@example.com",
+        "password": "aA1-K+4fX",
+        "first_name": "First",
+        "last_name": "Last",
+    }
+
+    def test_serializer_correctly_serializes_valid_user_object(self):
+        data = self.test_data.copy()
+        user = User.objects.create_user(**data)
+        serializer = DeleteSerializer(user)
+        self.assertTrue(serializer.is_valid())
+        serializer.save()
+        self.assertFalse(serializer.data)

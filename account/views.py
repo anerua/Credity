@@ -45,3 +45,16 @@ class ChangeAuthView(GenericAPIView):
             return response.Response({"message": "Success"})
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class DeleteAPIView(GenericAPIView):
+    
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def delete(self, request):
+        user = request.user
+        serializer = DeleteSerializer(user)
+
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response({"message": "Success"}, status=status.HTTP_204_NO_CONTENT)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

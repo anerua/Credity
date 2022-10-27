@@ -302,18 +302,20 @@ class UserDeleteTests(APITestCase):
         refresh_token = response.data["refresh"]
 
         # Delete user
-        response = self.client.put(reverse("user_delete"), format='json', HTTP_AUTHORIZATION=f"Bearer {access_token}")
+        response = self.client.delete(reverse("user_delete"), format='json', HTTP_AUTHORIZATION=f"Bearer {access_token}")
         
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(response.data)
 
-        # Ensure refresh token cannot be used to generate a valid token again
+        # Test refresh token cannot be used to generate a valid token again
         response = self.client.post(reverse("token_refresh"), { "refresh": refresh_token }, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+        # Test user cannot login again
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
     def test_delete_user_unsuccessful_if_user_is_not_logged_in(self):
-        response = self.client.get(reverse("user_delete"))
+        response = self.client.delete(reverse("user_delete"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
