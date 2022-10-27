@@ -46,8 +46,10 @@ class TokenTests(APITestCase):
 
     def test_tokens_obtained_successfully(self):
         data = self.test_data.copy()
+
         # First register a user
         self.client.post(reverse("register"), data, format='json')
+
         del data["first_name"]
         del data["last_name"]
 
@@ -63,7 +65,27 @@ class TokenTests(APITestCase):
         del data["last_name"]
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-    
+
+    def test_tokens_not_generated_because_account_is_inactive(self):
+        data = self.test_data.copy()
+
+        # First register a user
+        self.client.post(reverse("register"), data, format='json')
+
+        del data["first_name"]
+        del data["last_name"]
+
+        # Obtain tokens for registered user
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        access_token = response.data["access"]
+
+        # Delete user
+        response = self.client.delete(reverse("user_delete"), format='json', HTTP_AUTHORIZATION=f"Bearer {access_token}")
+
+        # Try to obtain tokens for deleted user and fail
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class RefreshTokenTests(APITestCase):
 
@@ -79,6 +101,7 @@ class RefreshTokenTests(APITestCase):
 
         # First register a user
         self.client.post(reverse("register"), data, format='json')
+
         del data["first_name"]
         del data["last_name"]
 
@@ -93,8 +116,29 @@ class RefreshTokenTests(APITestCase):
         self.assertIn("access", response.data)
         self.assertNotEqual(old_access_token, response.data["access"])
 
-    def test_obtain_new_access_token_with_refresh_token_failed(self):
+    def test_obtain_new_access_token_with_refresh_token_failed_because_user_is_not_logged_in(self):
         response = self.client.post(reverse("token_refresh"), { "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU4OTIwNTc3LCJpYXQiOjE2NTg5MjAyNzcsImp0aSI6IjlhZmU4Y2FiNzVmYTQ3N2Q5OWVkZjg1NjMwNDg1OTA3IiwidXNlcl9pZCI6M30.538mLb9peYtG1MF58iwHaNYi7c8tRQgBe88p8st9ozk" }, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_obtain_new_access_token_with_refresh_token_failed_because_user_is_marked_as_inactive(self):
+        data = self.test_data.copy()
+
+        # First register a user
+        self.client.post(reverse("register"), data, format='json')
+
+        del data["first_name"]
+        del data["last_name"]
+
+        # Obtain tokens for registered user
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        access_token = response.data["access"]
+        refresh_token = response.data["refresh"]
+
+        # Delete user
+        response = self.client.delete(reverse("user_delete"), format='json', HTTP_AUTHORIZATION=f"Bearer {access_token}")
+
+        # Try to obtain access token with refresh token of deleted user and fail
+        response = self.client.post(reverse("token_refresh"), { "refresh": refresh_token }, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -112,6 +156,7 @@ class UserDetailTests(APITestCase):
 
         # First register a user
         self.client.post(reverse("register"), data, format='json')
+
         del data["first_name"]
         del data["last_name"]
 
@@ -144,6 +189,7 @@ class UserUpdateTests(APITestCase):
 
         # First register a user
         self.client.post(reverse("register"), data, format='json')
+
         del data["first_name"]
         del data["last_name"]
 
@@ -174,6 +220,7 @@ class UserUpdateTests(APITestCase):
 
         # First register a user
         self.client.post(reverse("register"), data, format='json')
+
         del data["first_name"]
         del data["last_name"]
 
@@ -201,6 +248,7 @@ class ChangeAuthTests(APITestCase):
 
         # First register a user
         self.client.post(reverse("register"), data, format='json')
+
         del data["first_name"]
         del data["last_name"]
 
@@ -230,6 +278,7 @@ class ChangeAuthTests(APITestCase):
 
         # First register a user
         self.client.post(reverse("register"), data, format='json')
+
         del data["first_name"]
         del data["last_name"]
 
@@ -253,6 +302,7 @@ class ChangeAuthTests(APITestCase):
 
         # First register a user
         self.client.post(reverse("register"), data, format='json')
+
         del data["first_name"]
         del data["last_name"]
 
@@ -274,13 +324,6 @@ class ChangeAuthTests(APITestCase):
 
 class UserDeleteTests(APITestCase):
     
-    """
-    1. Test error code
-    2. Test unsuccessful login of user
-    3. Test user is still in DB
-    
-    """
-
     test_data = {
         "email": "test@example.com",
         "password": "aA1-K+4fX",
@@ -293,6 +336,7 @@ class UserDeleteTests(APITestCase):
 
         # First register a user
         self.client.post(reverse("register"), data, format='json')
+
         del data["first_name"]
         del data["last_name"]
 
