@@ -76,14 +76,17 @@ class RefreshTokenTests(APITestCase):
 
     def test_obtain_new_access_token_with_refresh_token_successful(self):
         data = self.test_data.copy()
+
         # First register a user
         self.client.post(reverse("register"), data, format='json')
         del data["first_name"]
         del data["last_name"]
+
         # Obtain tokens for registered user
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         refresh_token = response.data["refresh"]
         old_access_token = response.data["access"]
+
         # Use refresh token to obtain new access token
         response = self.client.post(reverse("token_refresh"), { "refresh": refresh_token }, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -106,10 +109,12 @@ class UserDetailTests(APITestCase):
 
     def test_user_detail_request_successful_if_user_is_logged_in(self):
         data = self.test_data.copy()
+
         # First register a user
         self.client.post(reverse("register"), data, format='json')
         del data["first_name"]
         del data["last_name"]
+
         # Obtain tokens for registered user
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         access_token = response.data["access"]
@@ -136,10 +141,12 @@ class UserUpdateTests(APITestCase):
 
     def test_user_detail_update_successful_if_user_is_logged_in(self):
         data = self.test_data.copy()
+
         # First register a user
         self.client.post(reverse("register"), data, format='json')
         del data["first_name"]
         del data["last_name"]
+
         # Obtain tokens for registered user
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         access_token = response.data["access"]
@@ -164,10 +171,12 @@ class UserUpdateTests(APITestCase):
 
     def test_user_detail_update_unsuccessful_if_all_required_fields_are_not_provided(self):
         data = self.test_data.copy()
+
         # First register a user
         self.client.post(reverse("register"), data, format='json')
         del data["first_name"]
         del data["last_name"]
+
         # Obtain tokens for registered user
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         access_token = response.data["access"]
@@ -189,10 +198,12 @@ class ChangeAuthTests(APITestCase):
 
     def test_change_account_password_successful(self):
         data = self.test_data.copy()
+
         # First register a user
         self.client.post(reverse("register"), data, format='json')
         del data["first_name"]
         del data["last_name"]
+
         # Obtain tokens for registered user
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         access_token = response.data["access"]
@@ -216,10 +227,12 @@ class ChangeAuthTests(APITestCase):
 
     def test_change_account_password_failed_because_old_password_is_incorrect(self):
         data = self.test_data.copy()
+
         # First register a user
         self.client.post(reverse("register"), data, format='json')
         del data["first_name"]
         del data["last_name"]
+
         # Obtain tokens for registered user
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         access_token = response.data["access"]
@@ -237,10 +250,12 @@ class ChangeAuthTests(APITestCase):
 
     def test_change_account_password_failed_because_new_password_is_unacceptable(self):
         data = self.test_data.copy()
+
         # First register a user
         self.client.post(reverse("register"), data, format='json')
         del data["first_name"]
         del data["last_name"]
+
         # Obtain tokens for registered user
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         access_token = response.data["access"]
@@ -255,3 +270,50 @@ class ChangeAuthTests(APITestCase):
             HTTP_AUTHORIZATION=f"Bearer {access_token}"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class UserDeleteTests(APITestCase):
+    
+    """
+    1. Test error code
+    2. Test unsuccessful login of user
+    3. Test user is still in DB
+    
+    """
+
+    test_data = {
+        "email": "test@example.com",
+        "password": "aA1-K+4fX",
+        "first_name": "First",
+        "last_name": "Last",
+    }
+
+    def test_delete_user_successful_if_user_is_logged_in(self):
+        data = self.test_data.copy()
+
+        # First register a user
+        self.client.post(reverse("register"), data, format='json')
+        del data["first_name"]
+        del data["last_name"]
+
+        # Obtain tokens for registered user
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        access_token = response.data["access"]
+        refresh_token = response.data["refresh"]
+
+        # Delete user
+        response = self.client.put(reverse("user_delete"), format='json', HTTP_AUTHORIZATION=f"Bearer {access_token}")
+        
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Ensure refresh token cannot be used to generate a valid token again
+        response = self.client.post(reverse("token_refresh"), { "refresh": refresh_token }, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+    def test_delete_user_unsuccessful_if_user_is_not_logged_in(self):
+        response = self.client.get(reverse("user_delete"))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
