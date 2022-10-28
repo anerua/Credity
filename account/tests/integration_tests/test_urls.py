@@ -66,7 +66,7 @@ class TokenTests(APITestCase):
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_tokens_not_generated_because_account_is_inactive(self):
+    def test_tokens_not_generated_because_account_is_marked_inactive(self):
         data = self.test_data.copy()
 
         # First register a user
@@ -173,6 +173,26 @@ class UserDetailTests(APITestCase):
     def test_user_detail_request_unsuccessful_if_user_is_not_logged_in(self):
         response = self.client.get(reverse("user_detail"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    
+    def test_user_detail_request_unsuccessful_if_user_is_marked_inactive(self):
+        data = self.test_data.copy()
+
+        # First register a user
+        self.client.post(reverse("register"), data, format='json')
+
+        del data["first_name"]
+        del data["last_name"]
+
+        # Obtain tokens for registered user
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        access_token = response.data["access"]
+
+        # Delete user
+        response = self.client.delete(reverse("user_delete"), format='json', HTTP_AUTHORIZATION=f"Bearer {access_token}")
+
+        # Try to retrieve user details and fail
+        response = self.client.get(reverse("user_detail"), HTTP_AUTHORIZATION=f"Bearer {access_token}")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class UserUpdateTests(APITestCase):
@@ -230,6 +250,34 @@ class UserUpdateTests(APITestCase):
 
         response = self.client.put(reverse("user_update"), HTTP_AUTHORIZATION=f"Bearer {access_token}")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_user_detail_update_unsuccessful_if_user_is_marked_inactive(self):
+        data = self.test_data.copy()
+
+        # First register a user
+        self.client.post(reverse("register"), data, format='json')
+
+        del data["first_name"]
+        del data["last_name"]
+
+        # Obtain tokens for registered user
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        access_token = response.data["access"]
+
+        # Delete user
+        response = self.client.delete(reverse("user_delete"), format='json', HTTP_AUTHORIZATION=f"Bearer {access_token}")
+
+        new_data = self.test_data.copy()
+        new_data["first_name"] = "NewFirst"
+        new_data["last_name"] = "NewLast"
+        del new_data["password"]
+        response = self.client.put(
+            reverse("user_update"),
+            new_data,
+            format='json',
+            HTTP_AUTHORIZATION=f"Bearer {access_token}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class ChangeAuthTests(APITestCase):
@@ -321,6 +369,34 @@ class ChangeAuthTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_change_account_password_failed_because_user_is_marked_inactive(self):
+        data = self.test_data.copy()
+
+        # First register a user
+        self.client.post(reverse("register"), data, format='json')
+
+        del data["first_name"]
+        del data["last_name"]
+
+        # Obtain tokens for registered user
+        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
+        access_token = response.data["access"]
+
+        # Delete user
+        response = self.client.delete(reverse("user_delete"), format='json', HTTP_AUTHORIZATION=f"Bearer {access_token}")
+
+        # Try to change the password and fail
+        response = self.client.put(
+            reverse("change_auth"),
+            {
+                "old_password": data["password"],
+                "new_password": self.new_password,
+            },
+            format='json',
+            HTTP_AUTHORIZATION=f"Bearer {access_token}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class UserDeleteTests(APITestCase):
     
@@ -349,7 +425,7 @@ class UserDeleteTests(APITestCase):
         response = self.client.delete(reverse("user_delete"), format='json', HTTP_AUTHORIZATION=f"Bearer {access_token}")
         
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(response.data)
+        self.assertDictEqual(response.data, {"message": "Success"})
 
         # Test refresh token cannot be used to generate a valid token again
         response = self.client.post(reverse("token_refresh"), { "refresh": refresh_token }, format="json")
@@ -358,7 +434,6 @@ class UserDeleteTests(APITestCase):
         # Test user cannot login again
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
 
     def test_delete_user_unsuccessful_if_user_is_not_logged_in(self):
         response = self.client.delete(reverse("user_delete"))
