@@ -8,5 +8,6 @@ urlpatterns = [
     path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
     path("detail", views.DetailAPIView.as_view(), name="user_detail"),
     path("update", views.UpdateAPIView.as_view(), name="user_update"),
-    path("change-auth", views.ChangeAuthView.as_view(), name="change_auth")
+    path("change-auth", views.ChangeAuthView.as_view(), name="change_auth"),
+    path("delete", views.DeleteAPIView.as_view(), name="user_delete"),
 ]

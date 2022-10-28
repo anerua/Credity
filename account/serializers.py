@@ -1,4 +1,3 @@
-from asyncore import read
 from rest_framework import serializers
 from account.models import User
 from django.core import exceptions
@@ -94,3 +93,13 @@ class ChangeAuthSerializer(serializers.ModelSerializer):
         return super(ChangeAuthSerializer, self).validate(data)
 
 
+class DeleteSerializer(serializers.ModelSerializer):
+
+    is_active = serializers.BooleanField(write_only=True)
+
+    def __init__(self, instance, data={"is_active": False}):
+        super().__init__(instance, data)
+
+    class Meta:
+        model = User
+        fields = ("is_active",)
