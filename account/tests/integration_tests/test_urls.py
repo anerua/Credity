@@ -120,27 +120,6 @@ class RefreshTokenTests(APITestCase):
         response = self.client.post(reverse("token_refresh"), { "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjU4OTIwNTc3LCJpYXQiOjE2NTg5MjAyNzcsImp0aSI6IjlhZmU4Y2FiNzVmYTQ3N2Q5OWVkZjg1NjMwNDg1OTA3IiwidXNlcl9pZCI6M30.538mLb9peYtG1MF58iwHaNYi7c8tRQgBe88p8st9ozk" }, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_obtain_new_access_token_with_refresh_token_failed_because_user_is_marked_as_inactive(self):
-        data = self.test_data.copy()
-
-        # First register a user
-        self.client.post(reverse("register"), data, format='json')
-
-        del data["first_name"]
-        del data["last_name"]
-
-        # Obtain tokens for registered user
-        response = self.client.post(reverse("token_obtain_pair"), data, format='json')
-        access_token = response.data["access"]
-        refresh_token = response.data["refresh"]
-
-        # Delete user
-        response = self.client.delete(reverse("user_delete"), format='json', HTTP_AUTHORIZATION=f"Bearer {access_token}")
-
-        # Try to obtain access token with refresh token of deleted user and fail
-        response = self.client.post(reverse("token_refresh"), { "refresh": refresh_token }, format="json")
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
 
 class UserDetailTests(APITestCase):
 
@@ -427,11 +406,7 @@ class UserDeleteTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertDictEqual(response.data, {"message": "Success"})
 
-        # Test refresh token cannot be used to generate a valid token again
-        response = self.client.post(reverse("token_refresh"), { "refresh": refresh_token }, format="json")
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-        # Test user cannot login again
+        # Test user cannot generate token pair again
         response = self.client.post(reverse("token_obtain_pair"), data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 

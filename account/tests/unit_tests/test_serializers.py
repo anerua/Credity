@@ -1,7 +1,6 @@
 from rest_framework.test import APITestCase
 from account.serializers import *
 from account.models import User
-from django.contrib.auth.hashers import check_password
 
 
 class RegisterSerializerTests(APITestCase):
